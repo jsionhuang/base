@@ -1,9 +1,10 @@
 import pymysql.cursors
-
+import psycopg2
 #连接mysql数据库
 connection = pymysql.connect(host = '127.0.0.1',port = 3306,user = 'root',password = 'root',
                           db = 'test',charset = 'utf8',cursorclass = pymysql.cursors.DictCursor)
-
+#连接postgresql
+conn = psycopg2.connect(database='test', user='postgres', password='root', host='localhost')
 #通过cursor创建游标
 cursor = connection.cursor()
 
