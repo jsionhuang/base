@@ -1,5 +1,6 @@
 from PIL import Image
 
+
 #读取图像
 pil_im = Image.open('Penguins.jpg')
 #转化成灰色

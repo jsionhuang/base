@@ -1,5 +1,5 @@
-import os
-
+import os,shutil
+from static.config import getFiles
 #获得当前文件的路径目录
 nowdir = os.path.dirname(__file__)
 print('当前的目录为',nowdir)
@@ -15,3 +15,8 @@ print('文件是否存在：',flag)
 print(filename.endswith('py'))
 #将文件拆成文件名和后缀名
 print('全部：',os.path.splitext(filename),'文件名：',os.path.splitext(filename)[0],'后缀名：',os.path.splitext(filename)[1])
+#遍历目录里面的文件
+for i in os.listdir(getFiles()):
+    print(i)
+#复制单个文件
+shutil.copy(getFiles()+'/dir_a/1.text',getFiles()+'/dir_b')

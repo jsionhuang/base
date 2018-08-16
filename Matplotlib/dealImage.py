@@ -3,6 +3,7 @@ from PIL import Image
 import os
 from static.config import getImagesDir
 
+
 #读取图像到数组
 im = array(Image.open(os.path.join(getImagesDir(),'test.jpg')))
 #绘制图像
@@ -27,6 +28,7 @@ show()
 线型： 实线('-') 虚线('--') 点线(':')
 标记: 点(.) 圆圈(o) 正方形(s) 星型(*) 加号(+) 叉号(x)
 '''
+#图像的轮廓和直方图
 
 #读取图像
 im2 = array(Image.open(os.path.join(getImagesDir(),'Penguins.jpg')).convert('L'))
