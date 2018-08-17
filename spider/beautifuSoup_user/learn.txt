@@ -1,0 +1,87 @@
+html_markup="""
+ <div class="ecopyramid">
+ <ul id="producers">
+  <li class="producerlist">
+  <div class="name">plants</div>
+  <div class="number">100000</div>
+  </li>
+  <li class="producerlist">
+  <div class="name">algae</div>
+  <div class="number">100000</div>
+  </li>
+ </ul>
+ </div>
+ """
+''''''
+soup = BeautifulSoup(html_markup,'lxml')
+producer_entries = soup.ul
+print (producer_entries.name)
+producer_entries.name = "div"
+print (producer_entries.prettify())
+
+# 修改标签属性
+# 更新标签现有的属性值
+producer_entries['id'] = "producers_new_value"
+print (producer_entries.prettify())
+# 标签添加新的属性值
+producer_entries['class'] = "newclass"
+print (producer_entries.prettify())
+# 删除标签属性值
+del producer_entries['class']
+print (producer_entries.prettify())
+
+# 添加新的标签
+# new_tag 生成一个 tag 对象
+new_li_tag = soup.new_tag("li")
+# 标签对象添加属性的方法
+new_atag = soup.new_tag("a",href="www.example.com" ,rel="external nofollow" )
+new_li_tag.attrs = {'class':'producerlist'}
+soup = BeautifulSoup(html_markup,'lxml')
+producer_entries = soup.ul
+# 使用 append() 方法添加到末尾
+producer_entries.append(new_li_tag)
+print (producer_entries.prettify())
+# 生成两个 div 标签,将其插入到 li 标签中
+new_div_name_tag = soup.new_tag("div")
+new_div_name_tag['class'] = "name"
+new_div_number_tag = soup.new_tag("div")
+new_div_number_tag["class"] = "number"
+# 使用 insert() 方法指定位置插入
+new_li_tag.insert(0,new_div_name_tag)
+new_li_tag.insert(1,new_div_number_tag)
+print (new_li_tag.prettify())
+
+# 修改字符串内容
+# 使用 .string 属性修改字符串内容
+new_div_name_tag.string = 'new_div_name'
+# 使用 .append() 方法添加字符串内容
+new_div_name_tag.append("producer")
+# 使用 soup 对象的 new_string() 方法生成字符串
+new_string_toappend = soup.new_string("producer")
+new_div_name_tag.append(new_string_toappend)
+# 使用insert() 方法插入
+new_string_toinsert = soup.new_string("10000")
+new_div_number_tag.insert(0,new_string_toinsert)
+print (producer_entries.prettify())
+
+# 删除节点
+third_producer = soup.find_all("li")[2]
+# 使用 decompose() 方法删除 div 节点
+div_name = third_producer.div
+div_name.decompose()
+print (third_producer.prettify())
+# 使用 extract() 方法删除节点
+third_producer_removed = third_producer.extract()
+print (soup.prettify())
+
+# wrap()方法
+li_tags = soup.find_all('li')
+for li in li_tags:
+ new_div_tag = soup.new_tag('div')
+ li.wrap(new_div_tag)
+print (soup.prettify())
+# unwrap()方法
+li_tags = soup.find_all("li")
+for li in li_tags:
+ li.div.unwrap()
+print (soup.prettify())

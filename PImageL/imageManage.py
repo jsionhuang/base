@@ -1,5 +1,5 @@
 from PIL import Image
-
+import os
 
 #读取图像
 pil_im = Image.open('Penguins.jpg')
