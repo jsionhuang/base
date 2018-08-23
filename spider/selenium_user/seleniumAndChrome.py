@@ -8,7 +8,7 @@ from selenium.webdriver.chrome.options import Options
 chrome_options = Options()
 chrome_options.add_argument('--headless')
 chrome_options.add_argument('--disable-gpu')
-driver = webdriver.Chrome(chrome_options=chrome_options)#pip install selenium==2.48.0,3.0版本以上的selenium不支持
+driver = webdriver.Chrome()#pip install selenium==2.48.0,3.0版本以上的selenium不支持
 driver.set_window_size(1366,768)
 #get,去请求对象url的界面,会等到页面加载结束，才会继续程序
 driver.set_page_load_timeout(100)
@@ -36,5 +36,5 @@ header.insert(0,topbannertags)
 driver.quit()#直接退出
 
 #print(soup2.prettify())
-with open('test.html','a+',encoding='utf-8') as f:
+with open('test.html','w',encoding='utf-8') as f:
     f.write(soup2.prettify())
