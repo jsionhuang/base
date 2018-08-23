@@ -3,17 +3,17 @@ from datetime import datetime
 from xlrd import xldate_as_tuple
 import psycopg2
 #根据有多少个sheets去创建多少个表
-def createtable(path):
+def createtable(excel_path):
+    #打卡数据库连接
+    conn = psycopg2.connect(database='cms', user='postgres', password='root', host='localhost')
+    cur = conn.cursor()
     # 读取excel
-    data = xlrd.open_workbook(path)
+    data = xlrd.open_workbook(excel_path)
     # 根据sheet索引获取sheet的内容
     print("excel全部的sheet为：", data.sheet_names())
     sheet_names = data.sheet_names()
     table_one = data.sheet_by_index(0)
-
     print("一个sheet的全部列名为", table_one.row_values(0))
-    conn = psycopg2.connect(database='test', user='postgres', password='root', host='localhost')
-    cur = conn.cursor()
     #for i in range(0, len(sheet_names)): 遍历全部的sheet
     for i in range(0, len(sheet_names)):
         #当前sheet的名字
@@ -60,10 +60,7 @@ def createtable(path):
             conn.commit()
             # 为sheet进行建表，
             cur.execute("ALTER TABLE %s ADD COLUMN  id SERIAL primary key  ;" % table_name)
-            conn.commit()
-            #        cur.execute("CREATE SEQUENCE users_id_seq  START WITH 1  INCREMENT BY 1  NO MINVALUE  NO MAXVALUE  CACHE 1;" )
-            #       conn.commit()
-            cur.execute("alter table  %s alter column id set default nextval('users_id_seq'); " % table_name)
+            cur.execute("alter table  %s alter column id set default nextval('%s_id_seq'); " %(table_name,table_name))
             conn.commit()
             for j in range(0, cols_num):
                 cur.execute("ALTER TABLE %s ADD COLUMN %s VARCHAR(200);" % (table_name, attrs[j]))
@@ -95,6 +92,8 @@ def createtable(path):
 
 
 def classfiy():
+    conn = psycopg2.connect(database='test', user='postgres', password='root', host='localhost')
+    cur = conn.cursor()
     f = xlrd.open_workbook('D:/workfile/site_td.xlsx')
     table = f.sheet_by_index(0)
     print('第一行的属性值为：',table.row_values(0))
@@ -104,9 +103,13 @@ def classfiy():
         data = table.row_values(i)
         if data[0] == 'shein':
             sql = "INSERT INTO classfiy(name,pre,lev) values('{0}',1,2)".format(data[1])
-            insert(sql)
+            cur.execute(sql)
+            conn.commit()
         elif data[0] == 'romwe':
             sql = "INSERT INTO classfiy(name,pre,lev) values('{0}',2,2)".format(data[1])
-            insert(sql)
+            cur.execute(sql)
+            conn.commit()
+
+createtable('D:\\workfile\\topcms2\\app\\static\\files\\site_td.xlsx')
 
 
