@@ -155,7 +155,7 @@ def backup_memo(bak_time, site_tp, site_id, site_url):
     download_files(html_content, html_path)
     download_html(html_content, html_path, site_tp, site_id)
 
-if __name__ == '__main__':
+def task():
     p = Pool(4)  # pool的默认大小是cpu的核数
     print('开始时间', datetime.now().strftime('%H:%M:%S'))
     bak_time = datetime.now().strftime('%Y-%m-%d_%H')
@@ -170,10 +170,24 @@ if __name__ == '__main__':
             p.apply_async(backup_memo, args=(bak_time, site_tp, site_id, site_url))
         except Exception as inst:
             print(inst)
-    #backup_memo(bak_time, 'romwe', 'rwau', 'http://au.romwe.com')
-    p.close()#close之后就不能添加新的进程
-    p.join()#会等待所有子程序执行完毕
-    print('所有线程结束','结束时间', time.strftime("%H:%M:%S"))
+    # backup_memo(bak_time, 'romwe', 'rwau', 'http://au.romwe.com')
+    p.close()  # close之后就不能添加新的进程
+    p.join()  # 会等待所有子程序执行完毕
+    print('所有线程结束', '结束时间', time.strftime("%H:%M:%S"))
+
+def time_task(h=0,m=0):
+    while True:
+        while True:
+            now = datetime.now()
+            if now.hour==h and now.minute==m:
+                break
+            time.sleep(20)#20秒检查一次
+        task()
+if __name__ == '__main__':
+    time_task(10,00)
+    time_task(17,00)
+
+
 
 
 
