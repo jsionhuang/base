@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="delsuccessmsg" class="alert alert-success" role="alert" hidden=hidden></div>
+<div id="delerrormsg" class="alert alert-danger" role="alert" hidden=hidden></div>
+</body>
+</html>
+
+<script type="text/javascript">
+     //修改结果提示结果提示
+    function hint_msg(obj, content) {
+        obj.empty()
+        obj.append("<strong>" + content + "</strong>")
+        obj.show()
+        //obj.fadeIn(1000)
+        //obj.fadeOut(2000)
+    }
+    function hint_success_msg(succes_obj,error_obj ,content) {
+        succes_obj.empty()
+        succes_obj.append("<strong>" + content + "</strong>")
+        error_obj.empty()
+        error_obj.hide()
+        succes_obj.show()
+        //obj.fadeIn(1000)
+        succes_obj.fadeOut(2000)
+    }
+</script>

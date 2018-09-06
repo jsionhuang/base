@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 import random
 import pandas as pd
 import time
-import bs4
+
 from multiprocessing import Pool
 STATIC_PATH = 'D:\\workfile\\topcms2\\app\static'#static目录
 EXECEL_PATH = '{}/files/site_td.xlsx'.format(STATIC_PATH)#读取站点信息的excel表格地址
@@ -74,7 +74,7 @@ def update_shein_topbanner(site_url):
     tag.decompose()#删除节点
     staict_html_header = static_html_soup.select('header[class="c-header"]')[0]#获得tag所在位置
     staict_html_header.insert(0, top_banner_tag)#在指定位置插入节点
-    print(static_html_soup.prettify())
+    #print(static_html_soup.prettify())
     return static_html_soup.prettify()
 
 #将动态加载得到的top-banner 加载到由request得到 的romwe的html界面
@@ -164,7 +164,7 @@ def task():
     for site in sites:
         site_tp = site[0].strip()
         site_id = site[1].strip()
-        site_url = 'http://{}'.format(site[2].strip())
+        site_url = 'https://{}'.format(site[2].strip())
         try:
             print(site_url)
             p.apply_async(backup_memo, args=(bak_time, site_tp, site_id, site_url))
@@ -184,7 +184,7 @@ def time_task(h=0,m=0):
             time.sleep(20)#20秒检查一次
         task()
 if __name__ == '__main__':
-    time_task(10,00)
+    time_task(11,32)
     time_task(17,00)
 
 
