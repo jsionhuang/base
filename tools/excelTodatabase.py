@@ -1,11 +1,12 @@
 import xlrd
 from datetime import datetime
 from xlrd import xldate_as_tuple
-import psycopg2
+import pymysql
 #根据有多少个sheets去创建多少个表
 def createtable(excel_path):
     #打卡数据库连接
-    conn = psycopg2.connect(database='cms', user='postgres', password='root', host='localhost')
+    conn = pymysql.connect(host='127.0.0.1', port=3306, user='root', password='root@123',
+                                 db='operating', charset='utf8', cursorclass=pymysql.cursors.DictCursor)
     cur = conn.cursor()
     # 读取excel
     data = xlrd.open_workbook(excel_path)
@@ -26,90 +27,40 @@ def createtable(excel_path):
         rows_numn = now_table.nrows
         # 获得当前的属性的数组，其实就是第一例的值
         attrs = now_table.row_values(0)
-        #判断表格是否存在
-        cur.execute("SELECT to_regclass('%s') is not null" % table_name)
-        flag = cur.fetchone()[0]
-        print('flag',flag)
-        if flag :
-            print('存在了,直接将表的内容插入')
-            # 将当前的sheet插入到数据库
-            for k in range(1, rows_numn):
-                row_vlaue = now_table.row_values(k)
-                print(row_vlaue)
-                print(','.join(attrs))
-                # 处理要插入的数据，把非字符串的数据转换成字符串类型，同事将字符串变成 sql语句需要的类型
-                for a in range(0, len(row_vlaue)):
-                    ctype = now_table.cell(k, a).ctype
-                    print('ctype', ctype)
-                    #ctype： 0 empty,1 string, 2 number, 3 date, 4 boolean, 5 error
-                    if ctype ==2 and  row_vlaue[a] % 1 ==0 :
-                        tmp = int(row_vlaue[a])
-                        row_vlaue[a] = str(tmp)
-                    if ctype == 3 :
-                        d = datetime(*xldate_as_tuple(row_vlaue[a],0))
-                        row_vlaue[a] = d.strftime('%Y-%m-%d %H')
-                    c = row_vlaue[a]
-                    row_vlaue[a] = "'" + c + "'"
-                print(','.join(row_vlaue))
-                sql = "INSERT INTO %s(%s) VALUES(%s)" % (table_name, ','.join(attrs), ','.join(row_vlaue))
-                print(sql)
-                cur.execute(sql)
-                conn.commit()
-        else:
-            cur.execute("CREATE TABLE " + table_name + "();")
+
+        sql = "CREATE TABLE if not exists {0}(id int primary key auto_increment)default charset=utf8;".format(table_name)
+        print(sql)
+        cur.execute(sql)
+        conn.commit()
+        for j in range(0, cols_num):
+            cur.execute("ALTER TABLE %s ADD COLUMN %s VARCHAR(255);" % (table_name, attrs[j]))
             conn.commit()
-            # 为sheet进行建表，
-            cur.execute("ALTER TABLE %s ADD COLUMN  id SERIAL primary key  ;" % table_name)
-            cur.execute("alter table  %s alter column id set default nextval('%s_id_seq'); " %(table_name,table_name))
+        # 将当前的sheet插入到数据库
+        for k in range(1, rows_numn):
+            row_vlaue = now_table.row_values(k)
+            print(row_vlaue)
+            print(','.join(attrs))
+            # 处理要插入的数据，把非字符串的数据转换成字符串类型，同事将字符串变成 sql语句需要的类型
+            for a in range(0, len(row_vlaue)):
+                ctype = now_table.cell(k, a).ctype
+                print('ctype', ctype)
+                # ctype： 0 empty,1 string, 2 number, 3 date, 4 boolean, 5 error
+                if ctype == 2 and row_vlaue[a] % 1 == 0:
+                    tmp = int(row_vlaue[a])
+                    row_vlaue[a] = str(tmp)
+                if ctype == 3:
+                    d = datetime(*xldate_as_tuple(row_vlaue[a], 0))
+                    row_vlaue[a] = d.strftime('%Y-%m-%d')
+                c = row_vlaue[a]
+                row_vlaue[a] = "'" + c + "'"
+            print(','.join(row_vlaue))
+            sql = "INSERT INTO %s(%s) VALUES(%s)" % (table_name, ','.join(attrs), ','.join(row_vlaue))
+            print(sql)
+            cur.execute(sql)
             conn.commit()
-            for j in range(0, cols_num):
-                cur.execute("ALTER TABLE %s ADD COLUMN %s VARCHAR(200);" % (table_name, attrs[j]))
-                conn.commit()
-            # 将当前的sheet插入到数据库
-            for k in range(1, rows_numn):
-                row_vlaue = now_table.row_values(k)
-                print(row_vlaue)
-                print(','.join(attrs))
-                # 处理要插入的数据，把非字符串的数据转换成字符串类型，同事将字符串变成 sql语句需要的类型
-                for a in range(0, len(row_vlaue)):
-                    ctype = now_table.cell(k, a).ctype
-                    print('ctype', ctype)
-                    # ctype： 0 empty,1 string, 2 number, 3 date, 4 boolean, 5 error
-                    if ctype == 2 and row_vlaue[a] % 1 == 0:
-                        tmp = int(row_vlaue[a])
-                        row_vlaue[a] = str(tmp)
-                    if ctype == 3:
-                        d = datetime(*xldate_as_tuple(row_vlaue[a], 0))
-                        row_vlaue[a] = d.strftime('%Y-%m-%d')
-                    c = row_vlaue[a]
-                    row_vlaue[a] = "'" + c + "'"
-                print(','.join(row_vlaue))
-                sql = "INSERT INTO %s(%s) VALUES(%s)" % (table_name, ','.join(attrs), ','.join(row_vlaue))
-                print(sql)
-                cur.execute(sql)
-                conn.commit()
     conn.close()
 
 
-def classfiy():
-    conn = psycopg2.connect(database='test', user='postgres', password='root', host='localhost')
-    cur = conn.cursor()
-    f = xlrd.open_workbook('D:/workfile/site_td.xlsx')
-    table = f.sheet_by_index(0)
-    print('第一行的属性值为：',table.row_values(0))
-    print('一共有{0}条数据'.format(table.nrows))
-    total_num = table.nrows
-    for i in range(1,total_num):
-        data = table.row_values(i)
-        if data[0] == 'shein':
-            sql = "INSERT INTO classfiy(name,pre,lev) values('{0}',1,2)".format(data[1])
-            cur.execute(sql)
-            conn.commit()
-        elif data[0] == 'romwe':
-            sql = "INSERT INTO classfiy(name,pre,lev) values('{0}',2,2)".format(data[1])
-            cur.execute(sql)
-            conn.commit()
-
-createtable('D:\\workfile\\topcms2\\app\\static\\files\\site_td.xlsx')
+createtable('/home/blues/Desktop/site_td.xlsx')
 
 
