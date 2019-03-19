@@ -10,7 +10,7 @@ def no_lock(arg):
 for i in range(0,100):
     t = threading.Thread(group=None,name=None,target=no_lock,args=(i,))
     t.start()
-print('no lock thread is over')
+print('no lock 线程 is over')
 
 rlock = threading.RLock()
 def is_lock(arg):

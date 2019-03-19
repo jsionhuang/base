@@ -7,7 +7,7 @@ class MyThread(threading.Thread):
         self.arg = arg
     def run(self):
         time.sleep(1)
-        print('the thread name is'+threading.currentThread().getName())
+        print('the 线程 name is'+threading.currentThread().getName())
         print('the arg is'+str(self.arg))
         time.sleep(1)
 

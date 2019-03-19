@@ -1,3 +1,7 @@
+'''
+一个父进程分为两个子进程，一个读，一个写
+'''
+
 from multiprocessing import Process,Queue
 import os,random,time
 
@@ -6,7 +10,7 @@ def write(q):
     print('{}process to write'.format(os.getpid()))
     for val in ['A','B','C']:
         print('将{}放入消息队列'.format(val))
-
+        q.put(val)
 def read(q):
     print('Process to read: %s' % os.getpid())
     while True:
